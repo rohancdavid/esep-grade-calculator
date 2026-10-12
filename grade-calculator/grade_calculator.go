@@ -1,9 +1,7 @@
 package esepunittests
 
 type GradeCalculator struct {
-	assignments []Grade
-	exams       []Grade
-	essays      []Grade
+	grades []Grade // changed for pt6 ec
 }
 
 type GradeType int
@@ -32,9 +30,7 @@ type Grade struct {
 
 func NewGradeCalculator() *GradeCalculator {
 	return &GradeCalculator{
-		assignments: make([]Grade, 0),
-		exams:       make([]Grade, 0),
-		essays:      make([]Grade, 0),
+		grades: make([]Grade, 0), // changed for pt6 ec
 	}
 }
 
@@ -54,34 +50,37 @@ func (gc *GradeCalculator) GetFinalGrade() string {
 	return "F"
 }
 
+// changed for pt6 ec
 func (gc *GradeCalculator) AddGrade(name string, grade int, gradeType GradeType) {
 	switch gradeType {
-	case Assignment:
-		gc.assignments = append(gc.assignments, Grade{
+	case Assignment, Exam, Essay:
+		gc.grades = append(gc.grades, Grade{
 			Name:  name,
 			Grade: grade,
-			Type:  Assignment,
-		})
-	case Exam:
-		gc.exams = append(gc.exams, Grade{
-			Name:  name,
-			Grade: grade,
-			Type:  Exam,
-		})
-	case Essay:
-		gc.essays = append(gc.essays, Grade{
-			Name:  name,
-			Grade: grade,
-			Type:  Essay,
+			Type:  gradeType,
 		})
 	}
 }
 
+// changed for pt6 ec
 func (gc *GradeCalculator) calculateNumericalGrade() int {
-	assignment_average := computeAverage(gc.assignments)
-	exam_average := computeAverage(gc.exams)
-	essay_average := computeAverage(gc.essays) // fixed error
+	assignments := make([]Grade, 0)
+	exams := make([]Grade, 0)
+	essays := make([]Grade, 0)
 
+    for _, grade := range gc.grades{
+        switch grade.Type{
+        case Assignment:
+            assignments = append(assignments, grade)
+        case Exam:
+            exams = append(exams, grade)
+        case Essay:
+            essays = append(essays, grade)
+        }
+    }
+    assignment_average := computeAverage(assignments)
+    exam_average := computeAverage(exams)
+    essay_average := computeAverage(essays)
 	weighted_grade := float64(assignment_average)*.5 + float64(exam_average)*.35 + float64(essay_average)*.15
 
 	return int(weighted_grade)
